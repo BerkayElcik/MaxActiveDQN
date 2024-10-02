@@ -115,11 +115,12 @@ class thz_drone_env(gym.Env):
             {
                 "channels": spaces.MultiBinary(self.n_channels),
                 #"distance": spaces.Discrete(11),# 0.001 km, 0.011 km, 0.021 km, 0.031 km, 0.041 km, 0.051 km, 0.061 km, 0.071 km, 0.081 km, 0.091 km, 0.101 km
-                "distance": spaces.Discrete(11, start=1),
-                "loss": spaces.Box(low=0,high=1e18, shape=(self.n_channels,), dtype=np.float32),
+                #"distance": spaces.Discrete(11, start=1),
+                "distance": spaces.Box(low=1, high=11, dtype=np.int32),
+                "loss": spaces.Box(low=1e9,high=1e18, shape=(self.n_channels,), dtype=np.float32),
                 "noise": spaces.Box(low=1e-14, high=1e-12, shape=(self.n_channels,), dtype=np.float32),
-                "max_snr": spaces.Box(low=0, high=1, dtype=np.float32),
-                "min_snr": spaces.Box(low=0, high=1, dtype=np.float32),
+                "max_snr": spaces.Box(low=0, high=1e10, dtype=np.float32),
+                "min_snr": spaces.Box(low=0, high=1e10, dtype=np.float32),
             }
         )
         # n_channels(0.75 THz - 4.4 THz) as center frequencies for 0.3 GHz wide boxes
@@ -560,7 +561,9 @@ class thz_drone_env(gym.Env):
 
 
 
-        self._distance=self.np_random.integers(0, 11, dtype=np.int32)
+        self._distance=np.random.randint(1, 12, dtype=np.int32)
+        print("Distance")
+        print(self._distance)
 
         #self._transmittance = self.channel_info(self._distance)
         self._loss, self._noise = self.channel_info(self._distance)
@@ -654,7 +657,7 @@ class thz_drone_env(gym.Env):
             )
         """
         if rng<self.freq_of_movement:
-            self._distance=self.np_random.integers(0, 11, dtype=np.int32)
+            self._distance=np.random.randint(1, 12, dtype=np.int32)
 
         self._loss, self._noise = self.channel_info(self._distance)
 

@@ -14,14 +14,19 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     #env = make_env('CUSTOM_ENV(not_ready)')
     #env = gym.make('CUSTOM_ENV(not_ready)')
-    env=thz_drone_env(n_channels=3000, P_T=1, freq_of_movement=0.1, no_of_actions=700)
+
+    no_of_channels=3000
+    no_of_actions=700
+
+    env=thz_drone_env(n_channels=no_of_channels, P_T=1, freq_of_movement=0.1, no_of_actions=no_of_actions)
 
     env = FlattenObservation(env)
 
 
     best_score = -np.inf
     load_checkpoint = False
-    n_games = 55
+    #n_games = 55
+    n_games=1000
 
     """
     agent = DQNAgent(gamma=0.99, epsilon=1, lr=0.0001,
@@ -53,14 +58,18 @@ if __name__ == '__main__':
 
     starting_eps=1
     ending_eps=0.01
-    no_activity=6000
+    #no_activity=4500
+    no_activity=200
+    n_training_steps=n_games*no_activity
+
+    dec_step_of_epsilon=(starting_eps-ending_eps)/(n_training_steps*0.4)
 
     agent = DoubleDQNAgent(input_dims=env.observation_space.shape[0],
                      n_actions=num_actions,
                      epsilon=starting_eps,
                      mem_size=2000,
                      eps_min=ending_eps,
-                     eps_dec=(starting_eps-ending_eps)/(no_activity*0.4),
+                     eps_dec=dec_step_of_epsilon,
                      chkpt_dir='models/', algo='DoubleDQNAgent',
                      env_name='THz_channel_selection')
 
@@ -98,6 +107,9 @@ if __name__ == '__main__':
     for i in range(n_games):
         done = False
         observation, info = env.reset()
+
+
+        #print(observation[no_of_channels]) #distance value
 
         """
         print("obsmain")
@@ -159,37 +171,37 @@ if __name__ == '__main__':
         steps_array.append(n_steps)
         Capacity_graph.append(info["capacity"])
 
-        if observation[50] == 1:
+        if observation[no_of_channels] == 1:
             distance_1_graph_scores.append(Score)
             distance_1_graph_capacity.append(info["capacity"])
-        elif observation[50] == 2:
+        elif observation[no_of_channels] == 2:
             distance_2_graph_scores.append(Score)
             distance_2_graph_capacity.append(info["capacity"])
-        elif observation[50] == 3:
+        elif observation[no_of_channels] == 3:
             distance_3_graph_scores.append(Score)
             distance_3_graph_capacity.append(info["capacity"])
-        elif observation[50] == 4:
+        elif observation[no_of_channels] == 4:
             distance_4_graph_scores.append(Score)
             distance_4_graph_capacity.append(info["capacity"])
-        elif observation[50] == 5:
+        elif observation[no_of_channels] == 5:
             distance_5_graph_scores.append(Score)
             distance_5_graph_capacity.append(info["capacity"])
-        elif observation[50] == 6:
+        elif observation[no_of_channels] == 6:
             distance_6_graph_scores.append(Score)
             distance_6_graph_capacity.append(info["capacity"])
-        elif observation[50] == 7:
+        elif observation[no_of_channels] == 7:
             distance_7_graph_scores.append(Score)
             distance_7_graph_capacity.append(info["capacity"])
-        elif observation[50] == 8:
+        elif observation[no_of_channels] == 8:
             distance_8_graph_scores.append(Score)
             distance_8_graph_capacity.append(info["capacity"])
-        elif observation[50] == 9:
+        elif observation[no_of_channels] == 9:
             distance_9_graph_scores.append(Score)
             distance_9_graph_capacity.append(info["capacity"])
-        elif observation[50] == 10:
+        elif observation[no_of_channels] == 10:
             distance_10_graph_scores.append(Score)
             distance_10_graph_capacity.append(info["capacity"])
-        elif observation[50] == 11:
+        elif observation[no_of_channels] == 11:
             distance_11_graph_scores.append(Score)
             distance_11_graph_capacity.append(info["capacity"])
 

@@ -8,7 +8,7 @@ from utils import cartesian
 class DoubleDQNAgent(object):
     #eps_dec=5e-7
     def __init__(self, n_actions, input_dims, gamma=0.999, epsilon=1, lr=0.001,
-                 mem_size=2000, batch_size=256, eps_min= 0.01, eps_dec=0.0004125,
+                 mem_size=2000, batch_size=256, eps_min= 0.01, eps_dec=1e-5,
                  replace=100, algo=None, env_name=None, chkpt_dir='tmp/dqn'):
         self.gamma = gamma
         self.epsilon = epsilon
