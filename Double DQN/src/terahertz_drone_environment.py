@@ -113,7 +113,7 @@ class thz_drone_env(gym.Env):
 
         self.observation_space = spaces.Dict(
             {
-                "channels": spaces.MultiBinary(self.n_channels),
+                #"channels": spaces.MultiBinary(self.n_channels),
                 #"distance": spaces.Discrete(11),# 0.001 km, 0.011 km, 0.021 km, 0.031 km, 0.041 km, 0.051 km, 0.061 km, 0.071 km, 0.081 km, 0.091 km, 0.101 km
                 #"distance": spaces.Discrete(11, start=1),
                 "distance": spaces.Box(low=1, high=11, dtype=np.int32),
@@ -187,7 +187,7 @@ class thz_drone_env(gym.Env):
 
     def _get_obs(self):
         return {
-            "channels": self._channels,
+            #"channels": self._channels,
             "distance": self._distance,
             #"transmittance": self._transmittance,
             "loss": self._loss,
@@ -198,10 +198,14 @@ class thz_drone_env(gym.Env):
 
     def _get_info(self):
         return {
+            "channels": self._channels,
             "no_of_channels": np.sum(self._channels),
             "capacity": self._capacity,
             "SNR_list": self._snr_list,
             "SNR_curve": self._snr_curve,
+            "action_index": self._action_index,
+            "snr_threshold": self._snr_threshold,
+            "distance": self._distance
         }
     """
     def pow_30(self, channels_obs=None, power_obs=None):
@@ -519,7 +523,7 @@ class thz_drone_env(gym.Env):
             channel_snr[channel_obs == 1] = snr_array[channel_obs==1]
         """
 
-        selected_channels = np.where(snr_array > threshold, 1, 0)
+        selected_channels = np.where(snr_array >= threshold, 1, 0)
 
 
         """
@@ -551,10 +555,11 @@ class thz_drone_env(gym.Env):
         #self._channels=np.ones(shape=(1,self.n_channels), dtype=np.int32)
         self._channels = np.ones(shape=(self.n_channels), dtype=np.int32)
 
+        """
         print("reset channels")
 
         print(self._channels)
-
+        """
 
         #self._power = self.np_random.integers(0, self.P_T, size=self.n_channels, dtype=int)
         #self._power=self.pow_30(self._channels, self._power)
@@ -562,8 +567,10 @@ class thz_drone_env(gym.Env):
 
 
         self._distance=np.random.randint(1, 12, dtype=np.int32)
+        """
         print("Distance")
         print(self._distance)
+        """
 
         #self._transmittance = self.channel_info(self._distance)
         self._loss, self._noise = self.channel_info(self._distance)
@@ -584,6 +591,9 @@ class thz_drone_env(gym.Env):
         self._capacity, self._max_snr, self._min_snr, self._snr_list, self._snr_curve= self.calc_capacity(self._channels, self._loss, self._noise)
 
 
+        self._action_index=0
+        self._snr_threshold = self.action2threshold(self._action_index, self._max_snr, self._min_snr)
+
         observation = self._get_obs()
         #print(observation)
         info = self._get_info()
@@ -596,6 +606,8 @@ class thz_drone_env(gym.Env):
         return observation, info
 
     def step(self, action):
+
+        self._action_index = action
 
 
 
@@ -624,9 +636,11 @@ class thz_drone_env(gym.Env):
         self._min_snr= observation["min_snr"]
 
 
-        threshold = self.action2threshold(action, self._max_snr, self._min_snr)
-        self._channels=self.threshold2channels(threshold, self._snr_curve)
+        self._snr_threshold = self.action2threshold(self._action_index, self._max_snr, self._min_snr)
+        self._channels=self.threshold2channels(self._snr_threshold, self._snr_curve)
         self._channels=self._channels.astype(np.int32)
+
+
 
 
 
