@@ -191,6 +191,9 @@ if __name__ == '__main__':
             observation = observation_
             n_steps += 1
             progress_bar.update(1)
+
+
+
         scores.append(Score)
         steps_array.append(n_steps)
         Capacity_graph.append(info["capacity"])
@@ -270,14 +273,17 @@ if __name__ == '__main__':
              ' average score %.1f' % avg_score, 'best score %.2f' % best_score,
             'epsilon %.2f' % agent.epsilon, 'steps', n_steps, "no of channels:", info['no_of_channels'])
 
+
         if avg_score > best_score:
             if not load_checkpoint:
                 agent.save_models()
             best_score = avg_score
 
+
         eps_history.append(agent.epsilon)
 
-
+    if not load_checkpoint:
+        agent.save_models()
 
     """
 
